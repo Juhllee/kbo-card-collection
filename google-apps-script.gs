@@ -4,7 +4,13 @@
  *  - 양도가능 : 보유한 카드 (KIA 제외)  → 남에게 줄 수 있는 카드
  *  - 구함     : KIA 중 아직 없는 카드    → 받고 싶은 카드
  */
-var TOKEN = 'Oxjun2180!';  // ← 앱 '동기화 설정'의 비밀키와 똑같이 바꾸세요
+var TOKEN = 'CHANGE_ME';  // ← 앱 '동기화 설정'의 비밀키와 똑같이 바꾸세요
+
+var TEAMC = {
+  'LG':['#C30452','#ffffff'], '삼성':['#0B4DA2','#ffffff'], 'KIA':['#EA0029','#ffffff'],
+  '두산':['#1A1748','#ffffff'], 'SSG':['#CE0E2D','#ffffff'], '롯데':['#041E42','#ffffff'],
+  '한화':['#FC4E00','#ffffff'], 'NC':['#1D2A4D','#ffffff'], 'KT':['#151515','#ffffff'], '키움':['#581015','#ffffff']
+};
 
 function doGet(e){ return json_({ok:true, msg:'KBO sync alive'}); }
 
@@ -47,6 +53,12 @@ function writeSheet_(ss, name, header, rows){
   sh.getRange(1,1,1,header.length).setFontWeight('bold').setBackground('#f1f3f4');
   var W = {'연도':60,'구단':70,'카드종류':95,'버전':70,'등번호':75,'선수명':110};
   for (var c=0;c<header.length;c++){ sh.setColumnWidth(c+1, W[header[c]] || 95); }
+  var tc = header.indexOf('구단');
+  if (tc >= 0 && rows.length){
+    var bg=[], fg=[];
+    for (var i=0;i<rows.length;i++){ var cc = TEAMC[rows[i][tc]] || ['#ffffff','#000000']; bg.push([cc[0]]); fg.push([cc[1]]); }
+    sh.getRange(2, tc+1, rows.length, 1).setBackgrounds(bg).setFontColors(fg).setFontWeight('bold').setHorizontalAlignment('center');
+  }
 }
 
 function json_(o){
