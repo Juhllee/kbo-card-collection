@@ -4,7 +4,7 @@
  *  - 양도가능 : 보유한 카드 (KIA 제외)  → 남에게 줄 수 있는 카드
  *  - 구함     : KIA 중 아직 없는 카드    → 받고 싶은 카드
  */
-var TOKEN = 'CHANGE_ME';  // ← 앱 '동기화 설정'의 비밀키와 똑같이 바꾸세요
+var TOKEN = 'Oxjun2180!';  // ← 앱 '동기화 설정'의 비밀키와 똑같이 바꾸세요
 
 function doGet(e){ return json_({ok:true, msg:'KBO sync alive'}); }
 
