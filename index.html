@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="KBO카드"/>
+<meta name="theme-color" content="#0f172a"/>
+<link rel="manifest" href="manifest.json"/>
+<link rel="apple-touch-icon" href="icon-180.png"/>
+<title>KBO 카드 컬렉션</title>
+<style>
+:root{--bg:#0f172a;--card:#1e293b;--card2:#273449;--line:#334155;--txt:#e2e8f0;--mut:#94a3b8;--accent:#38bdf8;}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--txt);
+ font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Helvetica Neue",sans-serif;
+ -webkit-font-smoothing:antialiased;}
+body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom);}
+a{color:inherit;text-decoration:none;}
+.wrap{max-width:680px;margin:0 auto;padding:0 14px 40px;}
+header.bar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:10px;
+ padding:calc(env(safe-area-inset-top) + 10px) 14px 10px;backdrop-filter:blur(10px);}
+header.bar .back{font-size:22px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;
+ border-radius:10px;background:rgba(255,255,255,.08);}
+header.bar h1{font-size:17px;margin:0;font-weight:700;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.bigtitle{text-align:center;padding:30px 0 8px;}
+.bigtitle .t{font-size:26px;font-weight:800;letter-spacing:-.5px;}
+.bigtitle .s{color:var(--mut);font-size:13px;margin-top:6px;}
+.years{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:18px;}
+.yearbtn{background:linear-gradient(135deg,#1e293b,#0b1220);border:1px solid var(--line);
+ border-radius:18px;padding:30px 16px;text-align:center;}
+.yearbtn .y{font-size:34px;font-weight:800;}
+.yearbtn .c{color:var(--mut);font-size:12px;margin-top:6px;}
+.teamgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px;}
+.teamcard{border-radius:16px;padding:14px;color:#fff;position:relative;overflow:hidden;min-height:96px;
+ display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 4px 14px rgba(0,0,0,.3);}
+.teamcard .kr{font-size:19px;font-weight:800;}
+.teamcard .en{font-size:10.5px;opacity:.85;letter-spacing:.5px;font-weight:600;margin-top:2px;}
+.teamcard .pg{font-size:11px;opacity:.95;margin-top:10px;font-variant-numeric:tabular-nums;}
+.tbar{height:5px;border-radius:3px;background:rgba(255,255,255,.25);margin-top:5px;overflow:hidden;}
+.tbar>i{display:block;height:100%;background:#fff;border-radius:3px;}
+.teamhero{border-radius:0 0 18px 18px;padding:16px 16px 18px;color:#fff;margin:0 -14px 14px;}
+.teamhero .kr{font-size:24px;font-weight:800;}
+.teamhero .en{font-size:12px;opacity:.85;font-weight:600;letter-spacing:.5px;}
+.teamhero .ov{margin-top:12px;font-size:12px;display:flex;justify-content:space-between;align-items:center;}
+.bigbar{height:8px;border-radius:5px;background:rgba(255,255,255,.25);margin-top:6px;overflow:hidden;}
+.bigbar>i{display:block;height:100%;background:#fff;}
+.cat{margin-top:18px;}
+.cat h2{font-size:15px;margin:0 0 8px;display:flex;align-items:center;gap:8px;}
+.cat h2 .badge{font-size:11px;color:var(--mut);font-weight:600;}
+.varhdr{display:flex;font-size:11px;color:var(--mut);padding:2px 12px 6px;gap:8px;}
+.varhdr .vh{width:54px;text-align:center;flex:none;}
+.varhdr .sp{flex:1;}
+.list{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;}
+.row{display:flex;align-items:center;padding:11px 12px;border-top:1px solid var(--line);gap:8px;}
+.row:first-child{border-top:none;}
+.row .nm{flex:1;font-size:15px;display:flex;align-items:center;gap:8px;min-width:0;}
+.row .nm .no{font-size:11px;color:var(--mut);background:var(--card2);border-radius:6px;
+ padding:2px 6px;font-variant-numeric:tabular-nums;flex:none;}
+.row .nm .note{font-size:10px;color:var(--mut);}
+.chk{width:54px;flex:none;display:flex;justify-content:center;}
+.box{width:30px;height:30px;border-radius:9px;border:2px solid var(--line);background:transparent;
+ display:flex;align-items:center;justify-content:center;font-size:16px;color:#fff;transition:.12s;}
+.box.on{border-color:transparent;}
+.box .ck{opacity:0;transform:scale(.5);transition:.12s;}
+.box.on .ck{opacity:1;transform:scale(1);}
+.toolbar{display:flex;gap:8px;justify-content:flex-end;margin-top:18px;flex-wrap:wrap;}
+.toolbar button{background:var(--card2);color:var(--txt);border:1px solid var(--line);
+ border-radius:10px;padding:9px 14px;font-size:13px;}
+.hint{color:var(--mut);font-size:11.5px;text-align:center;margin-top:24px;line-height:1.6;}
+.footer{color:var(--mut);font-size:11px;text-align:center;margin-top:26px;}
+</style>
+</head>
+<body>
+<script>window.__DATA__ = {"teams": [{"k": "LG", "eng": "LG TWINS", "color": "#C30452", "fg": "#ffffff"}, {"k": "삼성", "eng": "SAMSUNG LIONS", "color": "#0B4DA2", "fg": "#ffffff"}, {"k": "KIA", "eng": "KIA TIGERS", "color": "#EA0029", "fg": "#ffffff"}, {"k": "두산", "eng": "DOOSAN BEARS", "color": "#1A1748", "fg": "#ffffff"}, {"k": "SSG", "eng": "SSG LANDERS", "color": "#CE0E2D", "fg": "#ffffff"}, {"k": "롯데", "eng": "LOTTE GIANTS", "color": "#041E42", "fg": "#ffffff"}, {"k": "한화", "eng": "HANWHA EAGLES", "color": "#FC4E00", "fg": "#ffffff"}, {"k": "NC", "eng": "NC DINOS", "color": "#1D2A4D", "fg": "#C5A05A"}, {"k": "KT", "eng": "KT WIZ", "color": "#151515", "fg": "#E60012"}, {"k": "키움", "eng": "KIWOOM HEROES", "color": "#581015", "fg": "#ffffff"}], "data": {"2025": {"LG": [{"cat": "노멀", "variants": ["홈", "원정"], "players": [{"name": "김강률"}, {"name": "김영우"}, {"name": "김진성"}, {"name": "손주영"}, {"name": "임찬규"}, {"name": "박동원"}, {"name": "구본혁"}, {"name": "문보경"}, {"name": "신민재"}, {"name": "오지환"}, {"name": "김현수"}, {"name": "송찬의"}, {"name": "박해민"}, {"name": "홍창기"}]}, {"cat": "퍼즐", "variants": ["보유"], "players": [{"name": "김강률"}, {"name": "김영우"}, {"name": "임찬규"}, {"name": "박동원"}, {"name": "문보경"}, {"name": "오지환"}, {"name": "송찬의"}, {"name": "박해민"}, {"name": "홍창기"}]}, {"cat": "클로버", "variants": ["보유"], "players": [{"name": "오지환"}, {"name": "박해민"}, {"name": "홍창기"}]}, {"cat": "홀로/패러렐", "variants": ["홀로", "패러렐"], "players": [{"name": "김진성"}, {"name": "손주영"}, {"name": "박동원"}, {"name": "구본혁"}, {"name": "신민재"}, {"name": "김현수"}, {"name": "홍창기"}]}, {"cat": "오토", "variants": ["보유"], "players": [{"name": "임찬규"}, {"name": "박동원"}, {"name": "신민재"}, {"name": "오지환"}, {"name": "김현수"}, {"name": "박해민"}, {"name": "홍창기"}]}, {"cat": "스페셜", "variants": ["노멀", "홀로", "패러렐", "오토"], "players": [{"name": "김용수"}]}], "삼성": [{"cat": "노멀", "variants": ["홈", "원정"], "players": [{"name": "배찬승"}, {"name": "오승환"}, {"name": "원태인"}, {"name": "이승현"}, {"name": "최원태"}, {"name": "이호성"}, {"name": "강민호"}, {"name": "김영웅"}, {"name": "김지찬"}, {"name": "류지혁"}, {"name": "박병호"}, {"name": "이재현"}, {"name": "구자욱"}, {"name": "김헌곤"}]}, {"cat": "퍼즐", "variants": ["보유"], "players": [{"name": "오승환"}, {"name": "원태인"}, {"name": "이호성"}, {"name": "강민호"}, {"name": "김지찬"}, {"name": "류지혁"}, {"name": "박병호"}, {"name": "구자욱"}, {"name": "김헌곤"}]}, {"cat": "클로버", "variants": ["보유"], "players": [{"name": "김영웅"}, {"name": "이재현"}, {"name": "구자욱"}]}, {"cat": "홀로/패러렐", "variants": ["홀로", "패러렐"], "players": [{"name": "배찬승"}, {"name": "원태인"}, {"name": "이승현"}, {"name": "최원태"}, {"name": "김영웅"}, {"name": "이재현"}, {"name": "구자욱"}]}, {"cat": "오토", "variants": ["보유"], "players": [{"name": "원태인"}, {"name": "강민호"}, {"name": "김영웅"}, {"name": "김지찬"}, {"name": "류지혁"}, {"name": "이재현"}, {"name": "구자욱"}]}, {"cat": "스페셜", "variants": ["노멀", "홀로", "패러렐", "오토"], "players": [{"name": "박한이"}, {"name": "이승엽"}]}], "KIA": [{"cat": "노멀", "variants": ["홈", "원정"], "players": [{"name": "양현종"}, {"name": "윤영철"}, {"name": "정해영"}, {"name": "조상우"}, {"name": "황동하"}, {"name": "김태군"}, {"name": "한준수"}, {"name": "김도영"}, {"name": "김선빈"}, {"name": "박찬호"}, {"name": "서건창"}, {"name": "나성범"}, {"name": "최원준"}, {"name": "최형우"}]}, {"cat": "퍼즐", "variants": ["보유"], "players": [{"name": "양현종"}, {"name": "조상우"}, {"name": "김태군"}, {"name": "한준수"}, {"name": "김도영"}, {"name": "박찬호"}, {"name": "서건창"}, {"name": "나성범"}, {"name": "최형우"}]}, {"cat": "클로버", "variants": ["보유"], "players": [{"name": "양현종"}, {"name": "김도영"}, {"name": "나성범"}]}, {"cat": "홀로/패러렐", "variants": ["홀로", "패러렐"], "players": [{"name": "양현종"}, {"name": "윤영철"}, {"name": "정해영"}, {"name": "황동하"}, {"name": "김도영"}, {"name": "김선빈"}, {"name": "최원준"}]}, {"cat": "오토", "variants": ["보유"], "players": [{"name": "양현종"}, {"name": "윤영철"}, {"name": "정해영"}, {"name": "김도영"}, {"name": "김선빈"}, {"name": "박찬호"}, {"name": "나성범"}, {"name": "최원준"}]}, {"cat": "스페셜", "variants": ["노멀", "홀로", "패러렐", "오토"], "players": [{"name": "선동열"}, {"name": "이강철"}, {"name": "이종범"}, {"name": "장성호"}]}], "두산": [{"cat": "노멀", "variants": ["홈", "원정"], "players": [{"name": "곽빈"}, {"name": "김택연"}, {"name": "이병헌"}, {"name": "이영하"}, {"name": "홍건희"}, {"name": "양의지"}, {"name": "강승호"}, {"name": "박준영"}, {"name": "양석환"}, {"name": "오명진"}, {"name": "김민석"}, {"name": "김재환"}, {"name": "정수빈"}, {"name": "조수행"}]}, {"cat": "퍼즐", "variants": ["보유"], "players": [{"name": "김택연"}, {"name": "이병헌"}, {"name": "이영하"}, {"name": "홍건희"}, {"name": "양의지"}, {"name": "양석환"}, {"name": "김재환"}, {"name": "정수빈"}, {"name": "조수행"}]}, {"cat": "클로버", "variants": ["보유"], "players": [{"name": "김택연"}, {"name": "양의지"}, {"name": "정수빈"}]}, {"cat": "홀로/패러렐", "variants": ["홀로", "패러렐"], "players": [{"name": "곽빈"}, {"name": "김택연"}, {"name": "양의지"}, {"name": "강승호"}, {"name": "박준영"}, {"name": "오명진"}, {"name": "김민석"}]}, {"cat": "오토", "variants": ["보유"], "players": [{"name": "곽빈"}, {"name": "김택연"}, {"name": "양의지"}, {"name": "강승호"}, {"name": "양석환"}, {"name": "김재환"}, {"name": "정수빈"}]}, {"cat": "스페셜", "variants": ["노멀", "홀로", "패러렐", "오토"], "players": [{"name": "김선우"}, {"name": "장원준"}]}], "SSG": [{"cat": "노멀", "variants": ["홈", "원정"], "players": [{"name": "김광현"}, {"name": "노경은"}, {"name": "문승원"}, {"name": "송영진"}, {"name": "조병현"}, {"name": "이지영"}, {"name": "고명준"}, {"name": "박성한"}, {"name": "박지환"}, {"name": "정준재"}, {"name": "최정"}, {"name": "오태곤"}, {"name": "최지훈"}, {"name": "한유섬"}]}, {"cat": "퍼즐", "variants": ["보유"], "players": [{"name": "김광현"}, {"name": "문승원"}, {"name": "송영진"}, {"name": "이지영"}, {"name": "고명준"}, {"name": "박지환"}, {"name": "최정"}, {"name": "오태곤"}, {"name": "한유섬"}]}, {"cat": "클로버", "variants": ["보유"], "players": [{"name": "박성한"}, {"name": "최정"}, {"name": "최지훈"}]}, {"cat": "홀로/패러렐", "variants": ["홀로", "패러렐"], "players": [{"name": "김광현"}, {"name": "노경은"}, {"name": "조병현"}, {"name": "박성한"}, {"name": "정준재"}, {"name": "최정"}, {"name": "최지훈"}]}, {"cat": "오토", "variants": ["보유"], "players": [{"name": "김광현"}, {"name": "노경은"}, {"name": "조병현"}, {"name": "박성한"}, {"name": "최정"}, {"name": "오태곤"}, {"name": "최지훈"}]}], "롯데": [{"cat": "노멀", "variants": ["홈", "원정"], "players": [{"name": "정철원"}, {"name": "김원중"}, {"name": "김진욱"}, {"name": "박세웅"}, {"name": "정현수"}, {"name": "전민재"}, {"name": "유강남"}, {"name": "고승민"}, {"name": "나승엽"}, {"name": "박승욱"}, {"name": "손호영"}, {"name": "윤동희"}, {"name": "전준우"}, {"name": "황성빈"}]}, {"cat": "퍼즐", "variants": ["보유"], "players": [{"name": "정철원"}, {"name": "김원중"}, {"name": "김진욱"}, {"name": "정현수"}, {"name": "전민재"}, {"name": "유강남"}, {"name": "박승욱"}, {"name": "윤동희"}, {"name": "전준우"}]}, {"cat": "클로버", "variants": ["보유"], "players": [{"name": "김원중"}, {"name": "윤동희"}, {"name": "전준우"}]}, {"cat": "홀로/패러렐", "variants": ["홀로", "패러렐"], "players": [{"name": "김원중"}, {"name": "박세웅"}, {"name": "고승민"}, {"name": "나승엽"}, {"name": "손호영"}, {"name": "윤동희"}, {"name": "황성빈"}]}, {"cat": "오토", "variants": ["보유"], "players": [{"name": "김원중"}, {"name": "박세웅"}, {"name": "유강남"}, {"name": "손호영"}, {"name": "윤동희"}, {"name": "전준우"}, {"name": "황성빈"}]}, {"cat": "스페셜", "variants": ["노멀", "홀로", "패러렐", "오토"], "players": [{"name": "염종석"}]}], "한화": [{"cat": "노멀", "variants": ["홈", "원정"], "players": [{"name": "류현진"}, {"name": "문동주"}, {"name": "엄상백"}, {"name": "정우주"}, {"name": "주현상"}, {"name": "최재훈"}, {"name": "노시환"}, {"name": "문현빈"}, {"name": "심우준"}, {"name": "안치홍"}, {"name": "황영묵"}, {"name": "김태연"}, {"name": "채은성"}, {"name": "이진영"}]}, {"cat": "퍼즐", "variants": ["보유"], "players": [{"name": "류현진"}, {"name": "문동주"}, {"name": "주현상"}, {"name": "최재훈"}, {"name": "문현빈"}, {"name": "안치홍"}, {"name": "황영묵"}, {"name": "김태연"}, {"name": "채은성"}]}, {"cat": "클로버", "variants": ["보유"], "players": [{"name": "류현진"}, {"name": "문동주"}, {"name": "노시환"}]}, {"cat": "홀로/패러렐", "variants": ["홀로", "패러렐"], "players": [{"name": "류현진"}, {"name": "문동주"}, {"name": "엄상백"}, {"name": "정우주"}, {"name": "노시환"}, {"name": "심우준"}, {"name": "이진영"}]}, {"cat": "오토", "variants": ["보유"], "players": [{"name": "류현진"}, {"name": "문동주"}, {"name": "주현상"}, {"name": "노시환"}, {"name": "심우준"}, {"name": "안치홍"}, {"name": "채은성"}]}, {"cat": "스페셜", "variants": ["노멀", "홀로", "패러렐", "오토"], "players": [{"name": "정민철"}]}], "NC": [{"cat": "노멀", "variants": ["홈", "원정"], "players": [{"name": "류진욱"}, {"name": "김재열"}, {"name": "신민혁"}, {"name": "전사민"}, {"name": "한재승"}, {"name": "김형준"}, {"name": "김주원"}, {"name": "김휘집"}, {"name": "박민우"}, {"name": "서호철"}, {"name": "김태경"}, {"name": "권희동"}, {"name": "박건우"}, {"name": "손아섭"}]}, {"cat": "퍼즐", "variants": ["보유"], "players": [{"name": "류진욱"}, {"name": "김재열"}, {"name": "전사민"}, {"name": "김형준"}, {"name": "김휘집"}, {"name": "박민우"}, {"name": "서호철"}, {"name": "김태경"}, {"name": "박건우"}]}, {"cat": "클로버", "variants": ["보유"], "players": [{"name": "김주원"}, {"name": "박민우"}, {"name": "박건우"}]}, {"cat": "홀로/패러렐", "variants": ["홀로", "패러렐"], "players": [{"name": "신민혁"}, {"name": "한재승"}, {"name": "김주원"}, {"name": "박민우"}, {"name": "권희동"}, {"name": "박건우"}, {"name": "손아섭"}]}, {"cat": "오토", "variants": ["보유"], "players": [{"name": "류진욱"}, {"name": "김재열"}, {"name": "김형준"}, {"name": "김주원"}, {"name": "박민우"}, {"name": "권희동"}, {"name": "박건우"}]}], "KT": [{"cat": "노멀", "variants": ["홈", "원정"], "players": [{"name": "고영표"}, {"name": "소형준"}, {"name": "오원석"}, {"name": "원상현"}, {"name": "강백호"}, {"name": "장성우"}, {"name": "김상수"}, {"name": "문상철"}, {"name": "오윤석"}, {"name": "허경민"}, {"name": "황재균"}, {"name": "김민혁"}, {"name": "배정대"}, {"name": "천성호"}]}, {"cat": "퍼즐", "variants": ["보유"], "players": [{"name": "고영표"}, {"name": "소형준"}, {"name": "오원석"}, {"name": "강백호"}, {"name": "장성우"}, {"name": "오윤석"}, {"name": "황재균"}, {"name": "배정대"}, {"name": "천성호"}]}, {"cat": "클로버", "variants": ["보유"], "players": [{"name": "고영표"}, {"name": "강백호"}, {"name": "배정대"}]}, {"cat": "홀로/패러렐", "variants": ["홀로", "패러렐"], "players": [{"name": "원상현"}, {"name": "강백호"}, {"name": "장성우"}, {"name": "김상수"}, {"name": "문상철"}, {"name": "허경민"}, {"name": "김민혁"}]}, {"cat": "오토", "variants": ["보유"], "players": [{"name": "고영표"}, {"name": "소형준"}, {"name": "강백호"}, {"name": "장성우"}, {"name": "김상수"}, {"name": "김민혁"}, {"name": "배정대"}]}], "키움": [{"cat": "노멀", "variants": ["홈", "원정"], "players": [{"name": "김윤하"}, {"name": "여동욱"}, {"name": "이강준"}, {"name": "정현우"}, {"name": "주승우"}, {"name": "하영민"}, {"name": "김건희"}, {"name": "김태진"}, {"name": "송성문"}, {"name": "전태현"}, {"name": "최주환"}, {"name": "이용규"}, {"name": "이주형"}, {"name": "이형종"}]}, {"cat": "퍼즐", "variants": ["보유"], "players": [{"name": "정현우"}, {"name": "주승우"}, {"name": "김건희"}, {"name": "김태진"}, {"name": "송성문"}, {"name": "전태현"}, {"name": "최주환"}, {"name": "이주형"}, {"name": "이형종"}]}, {"cat": "클로버", "variants": ["보유"], "players": [{"name": "정현우"}, {"name": "송성문"}, {"name": "이주형"}]}, {"cat": "홀로/패러렐", "variants": ["홀로", "패러렐"], "players": [{"name": "김윤하"}, {"name": "여동욱"}, {"name": "이강준"}, {"name": "하영민"}, {"name": "송성문"}, {"name": "이용규"}, {"name": "이주형"}]}, {"cat": "오토", "variants": ["보유"], "players": [{"name": "하영민"}, {"name": "송성문"}, {"name": "최주환"}, {"name": "이용규"}, {"name": "이주형"}, {"name": "이형종"}]}]}, "2026": {"LG": [{"cat": "노멀", "variants": ["홈", "어웨이"], "players": [{"name": "김영우", "no": 67}, {"name": "손주영", "no": 29}, {"name": "송승기", "no": 13}, {"name": "유영찬", "no": 54}, {"name": "이정용", "no": 31}, {"name": "임찬규", "no": 1}, {"name": "박동원", "no": 27}, {"name": "구본혁", "no": 6}, {"name": "문보경", "no": 2}, {"name": "신민재", "no": 4}, {"name": "오지환", "no": 10}, {"name": "문성주", "no": 8}, {"name": "박해민", "no": 17}, {"name": "홍창기", "no": 51}]}, {"cat": "알파벳", "variants": ["보유"], "players": [{"name": "김영우", "no": 67}, {"name": "송승기", "no": 13}, {"name": "유영찬", "no": 54}, {"name": "이정용", "no": 31}, {"name": "임찬규", "no": 1}, {"name": "구본혁", "no": 6}, {"name": "신민재", "no": 4}, {"name": "오지환", "no": 10}, {"name": "문성주", "no": 8}, {"name": "박해민", "no": 17}]}, {"cat": "홀로", "variants": ["일반", "패러렐"], "players": [{"name": "김영우", "no": 67}, {"name": "손주영", "no": 29}, {"name": "박동원", "no": 27}, {"name": "문보경", "no": 2}, {"name": "신민재", "no": 4}, {"name": "박해민", "no": 17}, {"name": "홍창기", "no": 51}]}, {"cat": "승리부적", "variants": ["보유"], "players": [{"name": "임찬규", "no": 1}, {"name": "문보경", "no": 2}, {"name": "홍창기", "no": 51}]}, {"cat": "오토그래프", "variants": ["보유"], "players": [{"name": "김영우", "no": 67}, {"name": "손주영", "no": 29}, {"name": "박동원", "no": 27}, {"name": "문보경", "no": 2}, {"name": "신민재", "no": 4}, {"name": "문성주", "no": 8}, {"name": "박해민", "no": 17}]}, {"cat": "스페셜", "variants": ["보유"], "players": [{"name": "이상훈", "no": 47}]}], "삼성": [{"cat": "노멀", "variants": ["홈", "어웨이"], "players": [{"name": "김재윤", "no": 62}, {"name": "배찬승", "no": 55}, {"name": "백정현", "no": 29}, {"name": "이승민", "no": 28}, {"name": "이승현", "no": 57}, {"name": "최원태", "no": 20}, {"name": "강민호", "no": 47}, {"name": "김영웅", "no": 30}, {"name": "류지혁", "no": 16}, {"name": "이재현", "no": 7}, {"name": "구자욱", "no": 5}, {"name": "김성윤", "no": 39}, {"name": "김지찬", "no": 58}, {"name": "최형우", "no": 34}]}, {"cat": "알파벳", "variants": ["보유"], "players": [{"name": "김재윤", "no": 62}, {"name": "배찬승", "no": 55}, {"name": "이승민", "no": 28}, {"name": "이승현", "no": 57}, {"name": "최원태", "no": 20}, {"name": "강민호", "no": 47}, {"name": "류지혁", "no": 16}, {"name": "김성윤", "no": 39}, {"name": "김지찬", "no": 58}, {"name": "최형우", "no": 34}]}, {"cat": "홀로", "variants": ["일반", "패러렐"], "players": [{"name": "배찬승", "no": 55}, {"name": "백정현", "no": 29}, {"name": "강민호", "no": 47}, {"name": "김영웅", "no": 30}, {"name": "이재현", "no": 7}, {"name": "구자욱", "no": 5}, {"name": "최형우", "no": 34}]}, {"cat": "승리부적", "variants": ["보유"], "players": [{"name": "김영웅", "no": 30}, {"name": "이재현", "no": 7}, {"name": "구자욱", "no": 5}]}, {"cat": "오토그래프", "variants": ["보유"], "players": [{"name": "배찬승", "no": 55}, {"name": "최원태", "no": 20}, {"name": "강민호", "no": 47}, {"name": "류지혁", "no": 16}, {"name": "구자욱", "no": 5}, {"name": "김성윤", "no": 39}, {"name": "최형우", "no": 34}]}, {"cat": "스페셜", "variants": ["보유"], "players": [{"name": "오승환", "no": 21}]}], "KIA": [{"cat": "노멀", "variants": ["홈", "어웨이"], "players": [{"name": "김범수", "no": 49}, {"name": "김태형", "no": 10}, {"name": "성영탁", "no": 65}, {"name": "양현종", "no": 54}, {"name": "이의리", "no": 48}, {"name": "전상현", "no": 51}, {"name": "정해영", "no": 62}, {"name": "최지민", "no": 39}, {"name": "김태군", "no": 42}, {"name": "김도영", "no": 5}, {"name": "김선빈", "no": 3}, {"name": "오선우", "no": 56}, {"name": "김호령", "no": 27}, {"name": "나성범", "no": 47}]}, {"cat": "알파벳", "variants": ["보유"], "players": [{"name": "김범수", "no": 49}, {"name": "김태형", "no": 10}, {"name": "성영탁", "no": 65}, {"name": "전상현", "no": 51}, {"name": "정해영", "no": 62}, {"name": "최지민", "no": 39}, {"name": "김태군", "no": 42}, {"name": "김도영", "no": 5}, {"name": "김선빈", "no": 3}, {"name": "오선우", "no": 56}, {"name": "김호령", "no": 27}, {"name": "나성범", "no": 47}]}, {"cat": "홀로", "variants": ["일반", "패러렐"], "players": [{"name": "양현종", "no": 54}, {"name": "이의리", "no": 48}, {"name": "김도영", "no": 5}, {"name": "김선빈", "no": 3}, {"name": "오선우", "no": 56}, {"name": "김호령", "no": 27}, {"name": "나성범", "no": 47}]}, {"cat": "승리부적", "variants": ["보유"], "players": [{"name": "양현종", "no": 54}, {"name": "김도영", "no": 5}, {"name": "김선빈", "no": 3}]}, {"cat": "오토그래프", "variants": ["보유"], "players": [{"name": "양현종", "no": 54}, {"name": "전상현", "no": 51}, {"name": "최지민", "no": 39}, {"name": "김태군", "no": 42}, {"name": "김도영", "no": 5}, {"name": "김선빈", "no": 3}, {"name": "나성범", "no": 47}]}], "두산": [{"cat": "노멀", "variants": ["홈", "어웨이"], "players": [{"name": "곽빈", "no": 47}, {"name": "김택연", "no": 63}, {"name": "이병헌", "no": 29}, {"name": "이영하", "no": 50}, {"name": "최민석", "no": 68}, {"name": "최승용", "no": 28}, {"name": "최원준", "no": 61}, {"name": "양의지", "no": 25}, {"name": "박준순", "no": 52}, {"name": "박찬호", "no": 7}, {"name": "안재석", "no": 62}, {"name": "양석환", "no": 53}, {"name": "오명진", "no": 6}, {"name": "정수빈", "no": 31}]}, {"cat": "알파벳", "variants": ["보유"], "players": [{"name": "이병헌", "no": 29}, {"name": "이영하", "no": 50}, {"name": "최민석", "no": 68}, {"name": "최승용", "no": 28}, {"name": "최원준", "no": 61}, {"name": "양의지", "no": 25}, {"name": "박준순", "no": 52}, {"name": "안재석", "no": 62}, {"name": "양석환", "no": 53}, {"name": "정수빈", "no": 31}]}, {"cat": "홀로", "variants": ["일반", "패러렐"], "players": [{"name": "곽빈", "no": 47}, {"name": "김택연", "no": 63}, {"name": "양의지", "no": 25}, {"name": "박준순", "no": 52}, {"name": "박찬호", "no": 7}, {"name": "오명진", "no": 6}, {"name": "정수빈", "no": 31}]}, {"cat": "승리부적", "variants": ["보유"], "players": [{"name": "김택연", "no": 63}, {"name": "오명진", "no": 6}, {"name": "정수빈", "no": 31}]}, {"cat": "오토그래프", "variants": ["보유"], "players": [{"name": "이영하", "no": 50}, {"name": "최민석", "no": 68}, {"name": "최승용", "no": 28}, {"name": "최원준", "no": 61}, {"name": "양의지", "no": 25}, {"name": "박준순", "no": 52}, {"name": "정수빈", "no": 31}]}, {"cat": "스페셜", "variants": ["보유"], "players": [{"name": "박철순", "no": 21, "note": "OB"}, {"name": "김동주", "no": 18}]}], "SSG": [{"cat": "노멀", "variants": ["홈", "어웨이"], "players": [{"name": "김광현", "no": 29}, {"name": "김건우", "no": 39}, {"name": "김민", "no": 1}, {"name": "노경은", "no": 38}, {"name": "이로운", "no": 92}, {"name": "조병현", "no": 19}, {"name": "최민준", "no": 30}, {"name": "조형우", "no": 20}, {"name": "고명준", "no": 18}, {"name": "박성한", "no": 2}, {"name": "오태곤", "no": 37}, {"name": "최정", "no": 14}, {"name": "최지훈", "no": 54}, {"name": "한유섬", "no": 35}]}, {"cat": "알파벳", "variants": ["보유"], "players": [{"name": "김광현", "no": 29}, {"name": "김건우", "no": 39}, {"name": "김민", "no": 1}, {"name": "노경은", "no": 38}, {"name": "이로운", "no": 92}, {"name": "조병현", "no": 19}, {"name": "최민준", "no": 30}, {"name": "조형우", "no": 20}, {"name": "고명준", "no": 18}, {"name": "박성한", "no": 2}, {"name": "오태곤", "no": 37}, {"name": "최정", "no": 14}, {"name": "최지훈", "no": 54}, {"name": "한유섬", "no": 35}]}, {"cat": "홀로", "variants": ["일반", "패러렐"], "players": [{"name": "김건우", "no": 39}, {"name": "노경은", "no": 38}, {"name": "조병현", "no": 19}, {"name": "고명준", "no": 18}, {"name": "박성한", "no": 2}, {"name": "최정", "no": 14}, {"name": "최지훈", "no": 54}]}, {"cat": "승리부적", "variants": ["보유"], "players": [{"name": "김광현", "no": 29}, {"name": "최정", "no": 14}, {"name": "최지훈", "no": 54}]}, {"cat": "오토그래프", "variants": ["보유"], "players": [{"name": "김민", "no": 1}, {"name": "노경은", "no": 38}, {"name": "이로운", "no": 92}, {"name": "조형우", "no": 20}, {"name": "고명준", "no": 18}, {"name": "최정", "no": 14}, {"name": "한유섬", "no": 35}]}, {"cat": "스페셜", "variants": ["보유"], "players": [{"name": "김강민", "no": 0}]}], "롯데": [{"cat": "노멀", "variants": ["홈", "어웨이"], "players": [{"name": "김원중", "no": 34}, {"name": "김진욱", "no": 15}, {"name": "박세웅", "no": 21}, {"name": "정현수", "no": 57}, {"name": "최준용", "no": 56}, {"name": "박정민", "no": 36}, {"name": "유강남", "no": 27}, {"name": "전민재", "no": 13}, {"name": "한동희", "no": 25}, {"name": "한태양", "no": 6}, {"name": "손호영", "no": 33}, {"name": "윤동희", "no": 91}, {"name": "전준우", "no": 8}, {"name": "황성빈", "no": 0}]}, {"cat": "알파벳", "variants": ["보유"], "players": [{"name": "김원중", "no": 34}, {"name": "김진욱", "no": 15}, {"name": "박세웅", "no": 21}, {"name": "정현수", "no": 57}, {"name": "최준용", "no": 56}, {"name": "박정민", "no": 36}, {"name": "유강남", "no": 27}, {"name": "한동희", "no": 25}, {"name": "한태양", "no": 6}, {"name": "손호영", "no": 33}, {"name": "전준우", "no": 8}, {"name": "황성빈", "no": 0}]}, {"cat": "홀로", "variants": ["일반", "패러렐"], "players": [{"name": "김원중", "no": 34}, {"name": "박세웅", "no": 21}, {"name": "유강남", "no": 27}, {"name": "전민재", "no": 13}, {"name": "한태양", "no": 6}, {"name": "윤동희", "no": 91}, {"name": "전준우", "no": 8}]}, {"cat": "승리부적", "variants": ["보유"], "players": [{"name": "전민재", "no": 13}, {"name": "윤동희", "no": 91}, {"name": "전준우", "no": 8}]}, {"cat": "오토그래프", "variants": ["보유"], "players": [{"name": "박세웅", "no": 21}, {"name": "정현수", "no": 57}, {"name": "유강남", "no": 27}, {"name": "전민재", "no": 13}, {"name": "윤동희", "no": 91}, {"name": "전준우", "no": 8}, {"name": "황성빈", "no": 0}]}, {"cat": "스페셜", "variants": ["보유"], "players": [{"name": "이대호", "no": 10}]}], "한화": [{"cat": "노멀", "variants": ["홈", "어웨이"], "players": [{"name": "김서현", "no": 44}, {"name": "류현진", "no": 99}, {"name": "문동주", "no": 1}, {"name": "정우주", "no": 61}, {"name": "조동욱", "no": 57}, {"name": "황준서", "no": 29}, {"name": "최재훈", "no": 13}, {"name": "강백호", "no": 50}, {"name": "노시환", "no": 8}, {"name": "채은성", "no": 22}, {"name": "하주석", "no": 16}, {"name": "문현빈", "no": 51}, {"name": "오재원", "no": 54}, {"name": "이진영", "no": 10}]}, {"cat": "알파벳", "variants": ["보유"], "players": [{"name": "김서현", "no": 44}, {"name": "류현진", "no": 99}, {"name": "문동주", "no": 1}, {"name": "정우주", "no": 61}, {"name": "조동욱", "no": 57}, {"name": "황준서", "no": 29}, {"name": "최재훈", "no": 13}, {"name": "강백호", "no": 50}, {"name": "채은성", "no": 22}, {"name": "하주석", "no": 16}, {"name": "오재원", "no": 54}, {"name": "이진영", "no": 10}]}, {"cat": "홀로", "variants": ["일반", "패러렐"], "players": [{"name": "류현진", "no": 99}, {"name": "문동주", "no": 1}, {"name": "정우주", "no": 61}, {"name": "강백호", "no": 50}, {"name": "노시환", "no": 8}, {"name": "채은성", "no": 22}, {"name": "문현빈", "no": 51}]}, {"cat": "승리부적", "variants": ["보유"], "players": [{"name": "문동주", "no": 1}, {"name": "노시환", "no": 8}, {"name": "문현빈", "no": 51}]}, {"cat": "오토그래프", "variants": ["보유"], "players": [{"name": "김서현", "no": 44}, {"name": "류현진", "no": 99}, {"name": "최재훈", "no": 13}, {"name": "강백호", "no": 50}, {"name": "문현빈", "no": 51}, {"name": "이진영", "no": 10}]}, {"cat": "스페셜", "variants": ["보유"], "players": [{"name": "송진우", "no": 21, "note": "빙그레"}, {"name": "정근우", "no": 8}]}], "NC": [{"cat": "노멀", "variants": ["홈", "어웨이"], "players": [{"name": "구창모", "no": 59}, {"name": "김영규", "no": 17}, {"name": "김진호", "no": 54}, {"name": "류진욱", "no": 41}, {"name": "이준혁", "no": 40}, {"name": "전사민", "no": 57}, {"name": "김형준", "no": 25}, {"name": "김주원", "no": 7}, {"name": "김휘집", "no": 44}, {"name": "박민우", "no": 2}, {"name": "최정원", "no": 14}, {"name": "신재인", "no": 9}, {"name": "박건우", "no": 37}, {"name": "서호철", "no": 5}]}, {"cat": "알파벳", "variants": ["보유"], "players": [{"name": "김영규", "no": 17}, {"name": "김진호", "no": 54}, {"name": "류진욱", "no": 41}, {"name": "이준혁", "no": 40}, {"name": "전사민", "no": 57}, {"name": "김형준", "no": 25}, {"name": "김휘집", "no": 44}, {"name": "최정원", "no": 14}, {"name": "신재인", "no": 9}, {"name": "서호철", "no": 5}]}, {"cat": "홀로", "variants": ["일반", "패러렐"], "players": [{"name": "구창모", "no": 59}, {"name": "김영규", "no": 17}, {"name": "전사민", "no": 57}, {"name": "김형준", "no": 25}, {"name": "김주원", "no": 7}, {"name": "박민우", "no": 2}, {"name": "박건우", "no": 37}]}, {"cat": "승리부적", "variants": ["보유"], "players": [{"name": "구창모", "no": 59}, {"name": "김주원", "no": 7}, {"name": "박민우", "no": 2}]}, {"cat": "오토그래프", "variants": ["보유"], "players": [{"name": "김영규", "no": 17}, {"name": "김진호", "no": 54}, {"name": "김형준", "no": 25}, {"name": "김주원", "no": 7}, {"name": "김휘집", "no": 44}, {"name": "박민우", "no": 2}, {"name": "최정원", "no": 14}]}], "KT": [{"cat": "노멀", "variants": ["홈", "어웨이"], "players": [{"name": "고영표", "no": 1}, {"name": "박영현", "no": 60}, {"name": "소형준", "no": 30}, {"name": "김민수", "no": 26}, {"name": "우규민", "no": 12}, {"name": "한승혁", "no": 35}, {"name": "장성우", "no": 22}, {"name": "김상수", "no": 7}, {"name": "허경민", "no": 13}, {"name": "이강철", "no": 6}, {"name": "김현수", "no": 10}, {"name": "배정대", "no": 27}, {"name": "안현민", "no": 23}, {"name": "최원준", "no": 3}]}, {"cat": "알파벳", "variants": ["보유"], "players": [{"name": "고영표", "no": 1}, {"name": "박영현", "no": 60}, {"name": "김민수", "no": 26}, {"name": "우규민", "no": 12}, {"name": "한승혁", "no": 35}, {"name": "장성우", "no": 22}, {"name": "김상수", "no": 7}, {"name": "허경민", "no": 13}, {"name": "배정대", "no": 27}, {"name": "최원준", "no": 3}]}, {"cat": "홀로", "variants": ["일반", "패러렐"], "players": [{"name": "고영표", "no": 1}, {"name": "소형준", "no": 30}, {"name": "김상수", "no": 7}, {"name": "허경민", "no": 13}, {"name": "이강철", "no": 6}, {"name": "김현수", "no": 10}, {"name": "안현민", "no": 23}]}, {"cat": "승리부적", "variants": ["보유"], "players": [{"name": "고영표", "no": 1}, {"name": "소형준", "no": 30}, {"name": "안현민", "no": 23}]}, {"cat": "오토그래프", "variants": ["보유"], "players": [{"name": "박영현", "no": 60}, {"name": "소형준", "no": 30}, {"name": "우규민", "no": 12}, {"name": "김상수", "no": 7}, {"name": "허경민", "no": 13}, {"name": "안현민", "no": 23}]}], "키움": [{"cat": "노멀", "variants": ["홈", "어웨이"], "players": [{"name": "박윤성", "no": 35}, {"name": "김성진", "no": 21}, {"name": "김재웅", "no": 28}, {"name": "정현우", "no": 13}, {"name": "조영건", "no": 20}, {"name": "하영민", "no": 50}, {"name": "김건희", "no": 12}, {"name": "김태진", "no": 1}, {"name": "박찬혁", "no": 43}, {"name": "안치홍", "no": 9}, {"name": "어준서", "no": 92}, {"name": "최주환", "no": 53}, {"name": "이주형", "no": 2}, {"name": "임지열", "no": 29}]}, {"cat": "알파벳", "variants": ["보유"], "players": [{"name": "박윤성", "no": 35}, {"name": "김성진", "no": 21}, {"name": "김재웅", "no": 28}, {"name": "정현우", "no": 13}, {"name": "조영건", "no": 20}, {"name": "하영민", "no": 50}, {"name": "김태진", "no": 1}, {"name": "박찬혁", "no": 43}, {"name": "안치홍", "no": 9}, {"name": "어준서", "no": 92}, {"name": "최주환", "no": 53}, {"name": "임지열", "no": 29}]}, {"cat": "홀로", "variants": ["일반", "패러렐"], "players": [{"name": "조영건", "no": 20}, {"name": "하영민", "no": 50}, {"name": "안치홍", "no": 9}, {"name": "어준서", "no": 92}, {"name": "최주환", "no": 53}, {"name": "이주형", "no": 2}, {"name": "임지열", "no": 29}]}, {"cat": "승리부적", "variants": ["보유"], "players": [{"name": "정현우", "no": 13}, {"name": "김건희", "no": 12}, {"name": "이주형", "no": 2}]}, {"cat": "오토그래프", "variants": ["보유"], "players": [{"name": "정현우", "no": 13}, {"name": "하영민", "no": 50}, {"name": "김건희", "no": 12}, {"name": "김태진", "no": 1}, {"name": "최주환", "no": 53}, {"name": "이주형", "no": 2}]}, {"cat": "스페셜", "variants": ["보유"], "players": [{"name": "박병호", "no": 52}, {"name": "이택근", "no": 29}]}]}}};</script>
+<div id="app"></div>
+<script>
+const APP=document.getElementById('app');
+const D=window.__DATA__;
+const TEAMS=D.teams, DATA=D.data;
+const TM={}; TEAMS.forEach(t=>TM[t.k]=t);
+const LS='kbocards_v1';
+let STATE=JSON.parse(localStorage.getItem(LS)||'{}');
+function save(){localStorage.setItem(LS,JSON.stringify(STATE));}
+function key(y,t,c,name,no,v){return [y,t,c,(no!=null?no+'_':'')+name,v].join('|');}
+function isOn(k){return !!STATE[k];}
+function toggle(k){if(STATE[k])delete STATE[k];else STATE[k]=1;save();}
+
+// progress for a team
+function teamStats(y,t){let tot=0,own=0;(DATA[y][t]||[]).forEach(b=>{
+  b.players.forEach(p=>{b.variants.forEach(v=>{tot++;
+    if(isOn(key(y,t,b.cat,p.name,p.no,v)))own++;});});});return{tot,own};}
+function yearStats(y){let tot=0,own=0;TEAMS.forEach(tm=>{const s=teamStats(y,tm.k);tot+=s.tot;own+=s.own;});return{tot,own};}
+
+function esc(s){return (s+'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
+function route(){const h=location.hash.replace(/^#\/?/,'');const parts=h?h.split('/').map(decodeURIComponent):[];
+  if(parts.length>=2)return viewTeam(parts[0],parts[1]);
+  if(parts.length===1&&(parts[0]==='2025'||parts[0]==='2026'))return viewYear(parts[0]);
+  return viewHome();}
+
+function viewHome(){
+  const s25=yearStats('2025'),s26=yearStats('2026');
+  APP.innerHTML=`
+  <div class="wrap">
+    <div class="bigtitle"><div class="t">⚾ KBO 카드 컬렉션</div>
+      <div class="s">SCC · 7-ELEVEN · 연도를 선택하세요</div></div>
+    <div class="years">
+      <a class="yearbtn" href="#/2026"><div class="y">2026</div><div class="c">${s26.own} / ${s26.tot} 보유</div></a>
+      <a class="yearbtn" href="#/2025"><div class="y">2025</div><div class="c">${s25.own} / ${s25.tot} 보유</div></a>
+    </div>
+    <div class="hint">체크하면 보유 표시됩니다. 기록은 이 기기에 자동 저장돼요.<br>
+      Safari 공유 → <b>홈 화면에 추가</b> 하면 앱처럼 사용할 수 있습니다.</div>
+    <div class="footer">데이터: SCC 2025 / 2026 KBO 컬렉션 체크리스트</div>
+  </div>`;
+}
+
+function viewYear(y){
+  let cards='';
+  TEAMS.forEach(tm=>{const s=teamStats(y,tm.k);
+    const pct=s.tot?Math.round(s.own/s.tot*100):0;
+    cards+=`<a class="teamcard" style="background:${tm.color};color:${tm.fg}" href="#/${y}/${encodeURIComponent(tm.k)}">
+      <div><div class="kr">${tm.k}</div><div class="en">${tm.eng}</div></div>
+      <div><div class="pg">${s.own} / ${s.tot} · ${pct}%</div>
+      <div class="tbar"><i style="width:${pct}%;background:${tm.fg}"></i></div></div></a>`;});
+  APP.innerHTML=`
+  <header class="bar"><a class="back" href="#/">‹</a><h1>${y} 시즌 · 구단 선택</h1></header>
+  <div class="wrap"><div class="teamgrid">${cards}</div>
+  <div class="footer">구단을 선택해 선수별로 체크하세요</div></div>`;
+}
+
+function viewTeam(y,t){
+  if(!DATA[y]||!DATA[y][t]){location.hash='#/';return;}
+  const tm=TM[t]; const blocks=DATA[y][t];
+  const s=teamStats(y,t); const pct=s.tot?Math.round(s.own/s.tot*100):0;
+  let html=`<header class="bar"><a class="back" href="#/${y}">‹</a><h1>${y} · ${tm.k}</h1></header>
+  <div class="wrap">
+   <div class="teamhero" style="background:${tm.color};color:${tm.fg}">
+     <div class="kr">${tm.k}</div><div class="en">${tm.eng}</div>
+     <div class="ov"><span id="ovtxt">${s.own} / ${s.tot} 보유</span><span id="ovpct">${pct}%</span></div>
+     <div class="bigbar"><i id="ovbar" style="width:${pct}%;background:${tm.fg}"></i></div>
+   </div>`;
+  blocks.forEach((b,bi)=>{
+    const multi=!(b.variants.length===1&&b.variants[0]==='보유');
+    html+=`<div class="cat"><h2>${b.cat}<span class="badge">${b.players.length}명${multi?' · '+b.variants.join('/'):''}</span></h2>`;
+    if(multi){html+=`<div class="varhdr"><span class="sp"></span>`+
+      b.variants.map(v=>`<span class="vh">${v}</span>`).join('')+`</div>`;}
+    html+=`<div class="list">`;
+    b.players.forEach(p=>{
+      const no=(p.no!=null)?`<span class="no">${p.no}</span>`:'';
+      const note=p.note?`<span class="note">(${p.note})</span>`:'';
+      let boxes='';
+      b.variants.forEach(v=>{const k=key(y,t,b.cat,p.name,p.no,v);
+        boxes+=`<span class="chk"><span class="box${isOn(k)?' on':''}" data-k="${esc(k)}" style="${isOn(k)?'background:'+tm.color+';border-color:'+tm.color:''}"><span class="ck">✓</span></span></span>`;});
+      html+=`<div class="row"><div class="nm">${no}<span>${esc(p.name)}</span>${note}</div>${boxes}</div>`;
+    });
+    html+=`</div></div>`;
+  });
+  html+=`<div class="toolbar">
+     <button id="allbtn">전체 체크</button>
+     <button id="clrbtn">전체 해제</button>
+   </div>
+   <div class="footer">탭하면 보유 표시 / 자동 저장</div></div>`;
+  APP.innerHTML=html;
+
+  function refreshOv(){const s=teamStats(y,t);const pct=s.tot?Math.round(s.own/s.tot*100):0;
+    document.getElementById('ovtxt').textContent=`${s.own} / ${s.tot} 보유`;
+    document.getElementById('ovpct').textContent=pct+'%';
+    document.getElementById('ovbar').style.width=pct+'%';}
+  APP.querySelectorAll('.box').forEach(el=>{
+    el.addEventListener('click',()=>{const k=el.getAttribute('data-k');toggle(k);
+      const on=isOn(k);el.classList.toggle('on',on);
+      el.style.background=on?tm.color:''; el.style.borderColor=on?tm.color:'';
+      refreshOv();});});
+  document.getElementById('allbtn').onclick=()=>{blocks.forEach(b=>b.players.forEach(p=>b.variants.forEach(v=>{STATE[key(y,t,b.cat,p.name,p.no,v)]=1;})));save();viewTeam(y,t);};
+  document.getElementById('clrbtn').onclick=()=>{if(!confirm(tm.k+' 체크를 모두 해제할까요?'))return;blocks.forEach(b=>b.players.forEach(p=>b.variants.forEach(v=>{delete STATE[key(y,t,b.cat,p.name,p.no,v)];})));save();viewTeam(y,t);};
+}
+
+window.addEventListener('hashchange',route);
+route();
+if('serviceWorker' in navigator && location.protocol.startsWith('http')){
+  navigator.serviceWorker.register('sw.js').catch(()=>{});
+}
+</script>
+</body>
+</html>
