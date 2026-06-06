@@ -71,6 +71,15 @@ header.bar h1{font-size:17px;margin:0;font-weight:700;flex:1;overflow:hidden;tex
  border-radius:10px;padding:9px 14px;font-size:13px;}
 .hint{color:var(--mut);font-size:11.5px;text-align:center;margin-top:24px;line-height:1.6;}
 .footer{color:var(--mut);font-size:11px;text-align:center;margin-top:26px;}
+.btnlink{display:inline-block;background:var(--card2);border:1px solid var(--line);border-radius:11px;padding:11px 16px;font-size:13px;}
+.formrow{margin-top:16px;}
+.formrow label{display:block;font-size:12px;color:var(--mut);margin-bottom:6px;}
+.formrow input{width:100%;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;color:var(--txt);font-size:14px;}
+.switch{display:flex;align-items:center;gap:10px;margin-top:16px;font-size:14px;}
+.switch input{width:20px;height:20px;}
+.note2{color:var(--mut);font-size:12.5px;line-height:1.75;margin-top:16px;}
+.status{margin-top:14px;font-size:13px;padding:11px 12px;border-radius:10px;background:var(--card);border:1px solid var(--line);}
+.toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 20px);transform:translateX(-50%);background:#0b1220;border:1px solid var(--line);color:var(--txt);padding:11px 16px;border-radius:12px;font-size:13px;z-index:60;box-shadow:0 8px 24px rgba(0,0,0,.45);max-width:90%;text-align:center;}
 </style>
 </head>
 <body>
@@ -88,6 +97,36 @@ function key(y,t,c,name,no,v){return [y,t,c,(no!=null?no+'_':'')+name,v].join('|
 function isOn(k){return !!STATE[k];}
 function toggle(k){if(STATE[k])delete STATE[k];else STATE[k]=1;save();}
 
+// ---- 구글시트 동기화 ----
+let SYNC=JSON.parse(localStorage.getItem('kbocards_sync')||'{}');
+function saveSync(){localStorage.setItem('kbocards_sync',JSON.stringify(SYNC));}
+function toast(m){let t=document.createElement('div');t.className='toast';t.textContent=m;document.body.appendChild(t);setTimeout(()=>{t.style.opacity='0';},2300);setTimeout(()=>t.remove(),2700);}
+function buildPayload(){
+  const giveaway=[],want=[];
+  ['2025','2026'].forEach(y=>{TEAMS.forEach(tm=>{const t=tm.k;
+    (DATA[y][t]||[]).forEach(b=>{b.players.forEach(p=>{b.variants.forEach(v=>{
+      const on=isOn(key(y,t,b.cat,p.name,p.no,v));
+      const ver=(v==='보유')?'':v;
+      const row=[y,t,b.cat,ver,(p.no!=null?p.no:''),p.name];
+      if(t==='KIA'){ if(!on) want.push(row); } else { if(on) giveaway.push(row); }
+    });});});});});
+  return {token:SYNC.token||'',generatedAt:new Date().toISOString(),giveaway,want};
+}
+let _syncTimer=null;
+function scheduleSync(){if(!(SYNC.enabled&&SYNC.url))return;clearTimeout(_syncTimer);_syncTimer=setTimeout(()=>syncNow(true),4000);}
+async function syncNow(silent){
+  if(!SYNC.url){if(!silent)toast('동기화 설정에서 웹앱 URL을 먼저 입력하세요');return;}
+  const payload=buildPayload();
+  if(!silent)toast('동기화 중…');
+  try{
+    const res=await fetch(SYNC.url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});
+    let msg='전송됨';
+    try{const j=await res.json();msg=j.ok?('동기화 완료 · 양도 '+j.giveaway+' / 구함 '+j.want):('오류: '+(j.error||'?'));}catch(e){}
+    SYNC.last=new Date().toISOString();saveSync();
+    if(!silent)toast(msg);
+  }catch(e){if(!silent)toast('전송 실패: '+e);}
+}
+
 // progress for a team
 function teamStats(y,t){let tot=0,own=0;(DATA[y][t]||[]).forEach(b=>{
   b.players.forEach(p=>{b.variants.forEach(v=>{tot++;
@@ -96,6 +135,7 @@ function yearStats(y){let tot=0,own=0;TEAMS.forEach(tm=>{const s=teamStats(y,tm.
 
 function esc(s){return (s+'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
 function route(){const h=location.hash.replace(/^#\/?/,'');const parts=h?h.split('/').map(decodeURIComponent):[];
+  if(parts[0]==='sync')return viewSync();
   if(parts.length>=2)return viewTeam(parts[0],parts[1]);
   if(parts.length===1&&(parts[0]==='2025'||parts[0]==='2026'))return viewYear(parts[0]);
   return viewHome();}
@@ -110,10 +150,39 @@ function viewHome(){
       <a class="yearbtn" href="#/2026"><div class="y">2026</div><div class="c">${s26.own} / ${s26.tot} 보유</div></a>
       <a class="yearbtn" href="#/2025"><div class="y">2025</div><div class="c">${s25.own} / ${s25.tot} 보유</div></a>
     </div>
+    <div class="toolbar" style="justify-content:center;margin-top:16px">
+      <a class="btnlink" href="#/sync">☁︎ 구글시트 동기화${(SYNC.enabled&&SYNC.url)?' · 켜짐':''}</a>
+    </div>
     <div class="hint">체크하면 보유 표시됩니다. 기록은 이 기기에 자동 저장돼요.<br>
       Safari 공유 → <b>홈 화면에 추가</b> 하면 앱처럼 사용할 수 있습니다.</div>
     <div class="footer">데이터: SCC 2025 / 2026 KBO 컬렉션 체크리스트</div>
   </div>`;
+}
+
+function viewSync(){
+  APP.innerHTML=`
+  <header class="bar"><a class="back" href="#/">‹</a><h1>구글시트 동기화</h1></header>
+  <div class="wrap">
+   <div class="note2">앱에서 체크한 카드를 <b>구글 시트</b>로 보냅니다 (거래용).<br>
+     • <b>양도가능</b> 시트 = 내가 보유한 카드 (KIA 제외)<br>
+     • <b>구함</b> 시트 = 내가 모으는 KIA 중 아직 없는 카드</div>
+   <div class="formrow"><label>웹앱 URL (Apps Script 배포 주소)</label>
+     <input id="su" type="url" placeholder="https://script.google.com/macros/s/.../exec" value="${esc(SYNC.url||'')}"></div>
+   <div class="formrow"><label>비밀키 (스크립트의 TOKEN과 동일하게)</label>
+     <input id="st" type="text" placeholder="예: mysecret123" value="${esc(SYNC.token||'')}"></div>
+   <label class="switch"><input id="se" type="checkbox" ${SYNC.enabled?'checked':''}> 체크할 때 자동 전송</label>
+   <div class="toolbar">
+     <button id="ssave">저장</button>
+     <button id="stest">연결 테스트</button>
+     <button id="ssync">지금 동기화</button>
+   </div>
+   <div class="status" id="sstat">${SYNC.last?('마지막 동기화: '+new Date(SYNC.last).toLocaleString()):'아직 동기화한 적 없음'}</div>
+   <div class="note2">설정 방법: 저장소의 <b>SETUP_SYNC.md</b> 와 <b>google-apps-script.gs</b> 참고.</div>
+  </div>`;
+  const $=id=>document.getElementById(id);
+  $('ssave').onclick=()=>{SYNC.url=$('su').value.trim();SYNC.token=$('st').value.trim();SYNC.enabled=$('se').checked;saveSync();toast('저장됨');};
+  $('stest').onclick=async()=>{const u=$('su').value.trim();if(!u){toast('URL을 입력하세요');return;}toast('테스트 중…');try{const r=await fetch(u);const j=await r.json();toast(j.ok?'연결 OK ✓':('응답: '+JSON.stringify(j)));}catch(e){toast('연결 실패: '+e);}};
+  $('ssync').onclick=()=>{SYNC.url=$('su').value.trim();SYNC.token=$('st').value.trim();SYNC.enabled=$('se').checked;saveSync();syncNow(false);};
 }
 
 function viewYear(y){
@@ -172,9 +241,9 @@ function viewTeam(y,t){
     el.addEventListener('click',()=>{const k=el.getAttribute('data-k');toggle(k);
       const on=isOn(k);el.classList.toggle('on',on);
       el.style.background=on?tm.color:''; el.style.borderColor=on?tm.color:'';
-      refreshOv();});});
-  document.getElementById('allbtn').onclick=()=>{blocks.forEach(b=>b.players.forEach(p=>b.variants.forEach(v=>{STATE[key(y,t,b.cat,p.name,p.no,v)]=1;})));save();viewTeam(y,t);};
-  document.getElementById('clrbtn').onclick=()=>{if(!confirm(tm.k+' 체크를 모두 해제할까요?'))return;blocks.forEach(b=>b.players.forEach(p=>b.variants.forEach(v=>{delete STATE[key(y,t,b.cat,p.name,p.no,v)];})));save();viewTeam(y,t);};
+      refreshOv();scheduleSync();});});
+  document.getElementById('allbtn').onclick=()=>{blocks.forEach(b=>b.players.forEach(p=>b.variants.forEach(v=>{STATE[key(y,t,b.cat,p.name,p.no,v)]=1;})));save();scheduleSync();viewTeam(y,t);};
+  document.getElementById('clrbtn').onclick=()=>{if(!confirm(tm.k+' 체크를 모두 해제할까요?'))return;blocks.forEach(b=>b.players.forEach(p=>b.variants.forEach(v=>{delete STATE[key(y,t,b.cat,p.name,p.no,v)];})));save();scheduleSync();viewTeam(y,t);};
 }
 
 window.addEventListener('hashchange',route);
