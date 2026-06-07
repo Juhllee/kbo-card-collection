@@ -274,7 +274,7 @@ function viewTeam(y,t){
 window.addEventListener('hashchange',route);
 route();
 if('serviceWorker' in navigator && location.protocol.startsWith('http')){
-  navigator.serviceWorker.register('sw.js').catch(()=>{});
+  navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(r=>{ if(r&&r.update) r.update(); }).catch(()=>{});
 }
 </script>
 </body>
