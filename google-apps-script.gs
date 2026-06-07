@@ -19,23 +19,29 @@ function doPost(e){
     var body = JSON.parse(e.postData.contents);
     if (String(body.token) !== String(TOKEN)) return json_({ok:false, error:'bad token'});
     var ss = SpreadsheetApp.getActiveSpreadsheet();
-    var head = ['연도','구단','카드종류','버전','등번호','선수명'];
-    writeSheet_(ss, '양도가능(보유)', head, body.giveaway || []);
-    writeSheet_(ss, '구함(KIA 미보유)', head, body.want || []);
+    var head = ['구단','카드종류','버전','등번호','선수명'];
+    writeSheet_(ss, '양도가능 2025', head, body.give25 || []);
+    writeSheet_(ss, '양도가능 2026', head, body.give26 || []);
+    writeSheet_(ss, '구함(KIA) 2025', head, body.want25 || []);
+    writeSheet_(ss, '구함(KIA) 2026', head, body.want26 || []);
+    // 옛 통합 탭 정리
+    ['양도가능(보유)','구함(KIA 미보유)'].forEach(function(nm){ var o=ss.getSheetByName(nm); if(o) ss.deleteSheet(o); });
     var info = ss.getSheetByName('요약') || ss.insertSheet('요약');
     info.clear();
-    info.getRange(1,1,4,2).setValues([
+    info.getRange(1,1,6,2).setValues([
       ['마지막 업데이트', new Date()],
-      ['양도가능(보유) 수', (body.giveaway||[]).length],
-      ['구함(KIA) 수', (body.want||[]).length],
+      ['양도가능 2025', (body.give25||[]).length],
+      ['양도가능 2026', (body.give26||[]).length],
+      ['구함(KIA) 2025', (body.want25||[]).length],
+      ['구함(KIA) 2026', (body.want26||[]).length],
       ['앱 생성시각', body.generatedAt || '']
     ]);
-    info.getRange(1,1,4,1).setFontWeight('bold');
+    info.getRange(1,1,6,1).setFontWeight('bold');
     info.setColumnWidth(1,150); info.setColumnWidth(2,220);
-    // 탭 순서 정리: 양도가능 → 구함 → 요약(맨 뒤)
-    var order = ['양도가능(보유)','구함(KIA 미보유)','요약'];
+    // 탭 순서: 양도 25/26 → 구함 25/26 → 요약(맨 뒤)
+    var order = ['양도가능 2025','양도가능 2026','구함(KIA) 2025','구함(KIA) 2026','요약'];
     for (var i=0;i<order.length;i++){ var s=ss.getSheetByName(order[i]); if(s){ ss.setActiveSheet(s); ss.moveActiveSheet(i+1); } }
-    return json_({ok:true, giveaway:(body.giveaway||[]).length, want:(body.want||[]).length});
+    return json_({ok:true, give25:(body.give25||[]).length, give26:(body.give26||[]).length, want25:(body.want25||[]).length, want26:(body.want26||[]).length});
   }catch(err){ return json_({ok:false, error:String(err)}); }
 }
 

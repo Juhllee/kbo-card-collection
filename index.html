@@ -102,15 +102,16 @@ let SYNC=JSON.parse(localStorage.getItem('kbocards_sync')||'{}');
 function saveSync(){localStorage.setItem('kbocards_sync',JSON.stringify(SYNC));}
 function toast(m){let t=document.createElement('div');t.className='toast';t.textContent=m;document.body.appendChild(t);setTimeout(()=>{t.style.opacity='0';},2300);setTimeout(()=>t.remove(),2700);}
 function buildPayload(){
-  const giveaway=[],want=[];
-  ['2025','2026'].forEach(y=>{TEAMS.forEach(tm=>{const t=tm.k;
+  const out={give25:[],give26:[],want25:[],want26:[]};
+  ['2025','2026'].forEach(y=>{const gk=(y==='2025')?'give25':'give26',wk=(y==='2025')?'want25':'want26';
+    TEAMS.forEach(tm=>{const t=tm.k;
     (DATA[y][t]||[]).forEach(b=>{b.players.forEach(p=>{b.variants.forEach(v=>{
       const on=isOn(key(y,t,b.cat,p.name,p.no,v));
       const ver=(v==='보유')?'':v;
-      const row=[y,t,b.cat,ver,(p.no!=null?p.no:''),p.name];
-      if(t==='KIA'){ if(!on) want.push(row); } else { if(on) giveaway.push(row); }
+      const row=[t,b.cat,ver,(p.no!=null?p.no:''),p.name];
+      if(t==='KIA'){ if(!on) out[wk].push(row); } else { if(on) out[gk].push(row); }
     });});});});});
-  return {token:SYNC.token||'',generatedAt:new Date().toISOString(),giveaway,want};
+  return Object.assign({token:SYNC.token||'',generatedAt:new Date().toISOString()},out);
 }
 let _syncTimer=null;
 function scheduleSync(){if(!(SYNC.enabled&&SYNC.url))return;clearTimeout(_syncTimer);_syncTimer=setTimeout(()=>syncNow(true),4000);}
@@ -121,7 +122,7 @@ async function syncNow(silent){
   try{
     const res=await fetch(SYNC.url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});
     let msg='전송됨';
-    try{const j=await res.json();msg=j.ok?('동기화 완료 · 양도 '+j.giveaway+' / 구함 '+j.want):('오류: '+(j.error||'?'));}catch(e){}
+    try{const j=await res.json();msg=j.ok?('동기화 완료 · 양도 '+((j.give25||0)+(j.give26||0))+' / 구함 '+((j.want25||0)+(j.want26||0))):('오류: '+(j.error||'?'));}catch(e){}
     SYNC.last=new Date().toISOString();saveSync();
     if(!silent)toast(msg);
   }catch(e){if(!silent)toast('전송 실패: '+e);}
