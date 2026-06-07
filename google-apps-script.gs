@@ -39,7 +39,7 @@ function doPost(e){
     info.getRange(1,1,6,1).setFontWeight('bold');
     info.setColumnWidth(1,150); info.setColumnWidth(2,220);
     // 탭 순서: 양도 25/26 → 구함 25/26 → 요약(맨 뒤)
-    var order = ['양도가능 2025','양도가능 2026','구함(KIA) 2025','구함(KIA) 2026','요약'];
+    var order = ['양도가능 2026','구함(KIA) 2026','양도가능 2025','구함(KIA) 2025','요약'];
     for (var i=0;i<order.length;i++){ var s=ss.getSheetByName(order[i]); if(s){ ss.setActiveSheet(s); ss.moveActiveSheet(i+1); } }
     return json_({ok:true, give25:(body.give25||[]).length, give26:(body.give26||[]).length, want25:(body.want25||[]).length, want26:(body.want26||[]).length});
   }catch(err){ return json_({ok:false, error:String(err)}); }
